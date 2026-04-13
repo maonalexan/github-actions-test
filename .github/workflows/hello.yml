@@ -1,4 +1,4 @@
-name: Merhaba GitHub Actions
+name: Docker Container ile Calisma
 
 on:
   push:
@@ -6,23 +6,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  merhaba:
+  docker-test:
     runs-on: ubuntu-latest
+    container:
+      image: node:20-alpine
 
     steps:
       - name: Kodu indir
         uses: actions/checkout@v4
 
-      - name: Merhaba de
-        run: echo "Merhaba! GitHub Actions calisiyor!"
+      - name: Cache klasorunu geri yukle
+        uses: actions/cache@v4
+        with:
+          path: ./kalici-veri
+          key: kalici-veri-cache-v1
 
-      - name: Sistem bilgisi
+      - name: Container bilgisi goster
         run: |
-          echo "Isletim sistemi: $(uname -a)"
-          echo "Tarih: $(date)"
+          echo "--- CONTAINER BILGISI ---"
+          echo "Node surumu: $(node --version)"
+          echo "NPM surumu: $(npm --version)"
+          echo "OS: $(cat /etc/os-release | grep PRETTY_NAME)"
           echo "Kullanici: $(whoami)"
 
-      - name: Basit hesaplama
+      - name: Kalici dosyalari kontrol et ve guncelle
         run: |
-          echo "2 + 2 = $((2 + 2))"
-          echo "Workflow basariyla tamamlandi!"
+          mkdir -p ./kalici-veri
+          SAYAC_DOSYA=./kalici-veri/sayac.txt
+          LOG_DOSYA=./kalici-veri/calisma-gecmisi.log
+
+          if [ -f "$SAYAC_DOSYA" ]; then
+            SAYAC=$(cat $SAYAC_DOSYA)
+            echo "Onceki calisma sayisi: $SAYAC"
+          else
+            SAYAC=0
+            echo "Ilk calisma! Sayac sifirdan basliyor."
+          fi
+
+          SAYAC=$((SAYAC + 1))
+          echo $SAYAC > $SAYAC_DOSYA
+
+          echo "$(date): Calisma #$SAYAC tamamlandi" >> $LOG_DOSYA
+          echo "Simdi calisma numarasi: $SAYAC"
+          echo "--- GECMIS LOG ---"
+          cat $LOG_DOSYA
+
+      - name: Cache kaydet
+        uses: actions/cache@v4
+        with:
+          path: ./kalici-veri
+          key: kalici-veri-cache-v1
