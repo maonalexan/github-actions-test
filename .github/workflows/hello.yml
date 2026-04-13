@@ -1,0 +1,28 @@
+name: Merhaba GitHub Actions
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  merhaba:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodu indir
+        uses: actions/checkout@v4
+
+      - name: Merhaba de
+        run: echo "Merhaba! GitHub Actions calisiyor!"
+
+      - name: Sistem bilgisi
+        run: |
+          echo "Isletim sistemi: $(uname -a)"
+          echo "Tarih: $(date)"
+          echo "Kullanici: $(whoami)"
+
+      - name: Basit hesaplama
+        run: |
+          echo "2 + 2 = $((2 + 2))"
+          echo "Workflow basariyla tamamlandi!"
