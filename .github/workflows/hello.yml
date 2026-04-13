@@ -9,7 +9,7 @@ jobs:
   docker-test:
     runs-on: ubuntu-latest
     container:
-      image: node:20-alpine
+      image: node:20-slim
 
     steps:
       - name: Kodu indir
